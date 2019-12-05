@@ -31,24 +31,29 @@ namespace AdventOfCode {
             return;
          }
 
-         string name = $"AdventOfCode.Advent{year}.Day{day:00}";
-         IEnumerable<Type> adventDayTypes = Assembly.GetCallingAssembly()
-            .GetTypes()
-            .Where(t => typeof(IAdventDay).IsAssignableFrom(t))
-            .Where(t => !t.IsInterface && !t.IsAbstract);
+         try {
+            string name = $"AdventOfCode.Advent{year}.Day{day:00}";
+            IEnumerable<Type> adventDayTypes = Assembly.GetCallingAssembly()
+               .GetTypes()
+               .Where(t => typeof(IAdventDay).IsAssignableFrom(t))
+               .Where(t => !t.IsInterface && !t.IsAbstract);
 
-         if (args[0] == "all")
-            foreach (Type adventDayType in adventDayTypes) {
-               Solve(adventDayType, true);
-               Solve(adventDayType, false);
+            if (args[0] == "all")
+               foreach (Type adventDayType in adventDayTypes) {
+                  Solve(adventDayType, true);
+                  Solve(adventDayType, false);
+               }
+            else {
+               Type adventDayType = adventDayTypes.FirstOrDefault(t => t.FullName == name);
+               if (adventDayType == null) {
+                  Console.WriteLine("Day not solved");
+                  return;
+               }
+               Solve(adventDayType, args.Length <= 2);
             }
-         else {
-            Type adventDayType = adventDayTypes.FirstOrDefault(t => t.FullName == name);
-            if (adventDayType == null) {
-               Console.WriteLine("Day not solved");
-               return;
-            }
-            Solve(adventDayType, args.Length <= 2);
+         }
+         catch (Exception ex) {
+            Console.WriteLine($"[{ex.GetType().ToString()}]: {ex.Message}");
          }
       }
    }
