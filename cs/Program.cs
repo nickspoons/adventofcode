@@ -12,7 +12,8 @@ namespace AdventOfCode {
          string output = a ? adventDay.A() : adventDay.B();
          TimeSpan time = DateTime.Now.Subtract(start);
 
-         Console.WriteLine($"{output,-(80 - 15)}{time}");
+         string title = $"{adventDay.Year} {adventDay.Day:00}" + (a ? 'A' : 'B');
+         Console.WriteLine($"{title} {output,-(80 - 24)}{time}");
       }
 
       public static void Main(string[] args) {

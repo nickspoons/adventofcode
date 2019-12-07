@@ -1,7 +1,7 @@
 namespace AdventOfCode.Advent2019 {
    public class Day04 : AdventDay {
-      protected override int Day => 4;
-      protected override int Year => 2019;
+      public override int Day => 4;
+      public override int Year => 2019;
 
       // private const int FROM = 266666; // 264360
       // private const int TO = 699999; // 746325

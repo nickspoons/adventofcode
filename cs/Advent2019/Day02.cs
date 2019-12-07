@@ -2,8 +2,8 @@ using System.Linq;
 
 namespace AdventOfCode.Advent2019 {
    public class Day02 : AdventDay {
-      protected override int Day => 2;
-      protected override int Year => 2019;
+      public override int Day => 2;
+      public override int Year => 2019;
 
       private int Run(int a, int b) {
          int[] program = Input.Split(",").Select(int.Parse).ToArray();

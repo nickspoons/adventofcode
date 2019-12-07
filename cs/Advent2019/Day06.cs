@@ -4,8 +4,8 @@ using System.Linq;
 
 namespace AdventOfCode.Advent2019 {
    public class Day06 : AdventDay {
-      protected override int Day => 6;
-      protected override int Year => 2019;
+      public override int Day => 6;
+      public override int Year => 2019;
 
       public Dictionary<string, IEnumerable<string>> CalculateOrbits() {
          Dictionary<string, string> orbits = new Dictionary<string, string>();

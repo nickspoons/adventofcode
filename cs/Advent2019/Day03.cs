@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace AdventOfCode.Advent2019 {
    public class Day03 : AdventDay {
       // Bounds = {top: 3387, right: 7910, bottom: -12385, left: -5977}
-      protected override int Day => 3;
-      protected override int Year => 2019;
+      public override int Day => 3;
+      public override int Year => 2019;
 
       private delegate void OnMove((int, int) point, int x, int y, int length);
 

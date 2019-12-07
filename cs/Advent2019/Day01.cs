@@ -2,8 +2,8 @@ using System.Linq;
 
 namespace AdventOfCode.Advent2019 {
    public class Day01 : AdventDay {
-      protected override int Day => 1;
-      protected override int Year => 2019;
+      public override int Day => 1;
+      public override int Year => 2019;
 
       private int GetFuel(int mass) {
          return (mass / 3) - 2;

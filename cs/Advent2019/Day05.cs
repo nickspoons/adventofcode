@@ -3,8 +3,8 @@ using System.Linq;
 
 namespace AdventOfCode.Advent2019 {
    public class Day05 : AdventDay {
-      protected override int Day => 5;
-      protected override int Year => 2019;
+      public override int Day => 5;
+      public override int Year => 2019;
 
       private int GetParam(int[] program, int index, int param) {
          int div = 10;

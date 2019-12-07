@@ -4,8 +4,8 @@ using System.Linq;
 
 namespace AdventOfCode {
    public abstract class AdventDay : IAdventDay {
-      protected abstract int Day { get; }
-      protected abstract int Year { get; }
+      public abstract int Day { get; }
+      public abstract int Year { get; }
 
       protected string Input => File.ReadAllText($"Advent{Year}/Day{Day:00}-input");
 
