@@ -5,13 +5,11 @@ namespace AdventOfCode.Advent2019 {
       public override int Day => 2;
       public override int Year => 2019;
 
-      private IntcodeComputer Computer => new IntcodeComputer();
-
       public override string A() {
          int[] program = Input.Split(",").Select(int.Parse).ToArray();
          program[1] = 12;
          program[2] = 2;
-         Computer.Run(program).ToString();
+         IntcodeComputer.Run(program).ToString();
          return program[0].ToString();
       }
 
@@ -26,7 +24,7 @@ namespace AdventOfCode.Advent2019 {
             int[] program = (int[]) originalProgram.Clone();
             program[1] = ++a;
             program[2] = 0;
-            Computer.Run(program);
+            IntcodeComputer.Run(program);
             result = program[0];
          }
          int b = target - previous;
