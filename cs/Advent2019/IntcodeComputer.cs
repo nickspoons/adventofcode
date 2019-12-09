@@ -4,103 +4,121 @@ using System.Linq;
 
 namespace AdventOfCode.Advent2019 {
    public class IntcodeComputer {
-      public IntcodeComputer() { }
-
-      public IntcodeComputer(string program, params int[] inputs)
-         : this(program.Split(",").Select(int.Parse).ToArray(), inputs) { }
-
-      public IntcodeComputer(int[] program, params int[] inputs) {
-         Program = program;
-         foreach (int input in inputs)
+      public IntcodeComputer(string program, params long[] inputs) {
+         Program = program.Split(",").Select(long.Parse).ToList();
+         foreach (long input in inputs)
             Inputs.Enqueue(input);
       }
 
-      private readonly Queue<int> Inputs = new Queue<int>();
-      private int InsPointer = 0;
-      private readonly int[] Program;
-
-      public int Output { get; private set; } = -1;
-
-      private int GetParam(int[] program, int index, int param) {
-         int div = 10;
-         for (int i = 0; i < param; i++)
-            div *= 10;
-         int arg = program[index + param];
-         bool byVal = (program[index] / div % 10) == 1;
-         return byVal ? arg : program[arg];
+      public IntcodeComputer(long[] program, params long[] inputs) {
+         Program = program.ToList();
+         foreach (long input in inputs)
+            Inputs.Enqueue(input);
       }
 
+      private readonly Queue<long> Inputs = new Queue<long>();
+      private int Pointer = 0;
+      private readonly List<long> Program;
+      private int RelativeBase = 0;
+
+      /// <summary>The last value output by the computer</summary>
+      public long Output { get; private set; } = -1;
+
       public delegate void HaltHandler();
-      public delegate void OutputHandler(int output);
+      public delegate void OutputHandler(long output);
       public delegate void YieldHandler();
 
       public event HaltHandler OnHalt;
       public event OutputHandler OnOutput;
       public event YieldHandler OnYield;
 
+      private int GetMode(int offset) {
+         int div = 10;
+         for (int i = 0; i < offset; i++)
+            div *= 10;
+         return (int) GetValue(Pointer) / div % 10;
+      }
+
+      private long GetParam(int offset) {
+         long arg = GetValue(Pointer + offset);
+         switch (GetMode(offset)) {
+            case 0: // Position mode
+               return GetValue((int) arg);
+            case 1: // Parameter mode
+               return arg;
+            case 2: // Relative mode
+               return GetValue(RelativeBase + (int) arg);
+            default:
+               throw new InvalidOperationException(
+                  $"Invalid opcode: {Program[Pointer]}");
+         }
+      }
+
+      private long GetValue(int index) {
+         if (index > Program.Count)
+            Program.AddRange(Enumerable.Repeat(0L, index - Program.Count + 2));
+         return Program[index];
+      }
+
+      private void SetResult(int offset, long value) {
+         int index = (int) GetValue(Pointer + offset);
+         if (GetMode(offset) == 2)
+            index += RelativeBase;
+         if (index > Program.Count)
+            Program.AddRange(Enumerable.Repeat(0L, index - Program.Count + 2));
+         Program[index] = value;
+         Pointer += offset + 1;
+      }
+
       private void Run() {
          while (true) {
-            switch(Program[InsPointer] % 100) {
+            switch (GetValue(Pointer) % 100) {
                case 1: // Addition
-                  Program[Program[InsPointer + 3]] =
-                     GetParam(Program, InsPointer, 1) +
-                     GetParam(Program, InsPointer, 2);
-                  InsPointer += 4;
+                  SetResult(3, GetParam(1) + GetParam(2));
                   break;
                case 2: // Multiplication
-                  Program[Program[InsPointer + 3]] =
-                     GetParam(Program, InsPointer, 1) *
-                     GetParam(Program, InsPointer, 2);
-                  InsPointer += 4;
+                  SetResult(3, GetParam(1) * GetParam(2));
                   break;
                case 3: // Input
                   if (!Inputs.Any()) {
                      OnYield?.Invoke();
                      return;
                   }
-                  Program[Program[InsPointer + 1]] = Inputs.Dequeue();
-                  InsPointer += 2;
+                  SetResult(1, Inputs.Dequeue());
                   break;
                case 4: // Output
-                  Output = GetParam(Program, InsPointer, 1);
-                  InsPointer += 2;
+                  Output = GetParam(1);
+                  Pointer += 2;
                   OnOutput?.Invoke(Output);
                   break;
                case 5: // Jump-If-True
-                  if (GetParam(Program, InsPointer, 1) == 0)
-                     InsPointer += 3;
-                  else
-                     InsPointer = GetParam(Program, InsPointer, 2);
+                  Pointer = GetParam(1) == 0 ? Pointer + 3 : (int) GetParam(2);
                   break;
                case 6: // Jump-If-False
-                  if (GetParam(Program, InsPointer, 1) != 0)
-                     InsPointer += 3;
-                  else
-                     InsPointer = GetParam(Program, InsPointer, 2);
+                  Pointer = GetParam(1) != 0 ? Pointer + 3 : (int) GetParam(2);
                   break;
                case 7: // Less-Than
-                  Program[Program[InsPointer + 3]] =
-                     GetParam(Program, InsPointer, 1) <
-                     GetParam(Program, InsPointer, 2) ? 1 : 0;
-                  InsPointer += 4;
+                  SetResult(3, GetParam(1) < GetParam(2) ? 1 : 0);
                   break;
                case 8: // Equals
-                  Program[Program[InsPointer + 3]] =
-                     GetParam(Program, InsPointer, 1) ==
-                     GetParam(Program, InsPointer, 2) ? 1 : 0;
-                  InsPointer += 4;
+                  SetResult(3, GetParam(1) == GetParam(2) ? 1 : 0);
+                  break;
+               case 9: // Adjust-Relative-Base
+                  RelativeBase += (int) GetParam(1);
+                  Pointer += 2;
                   break;
                case 99:
                   OnHalt?.Invoke();
                   return;
                default:
                   throw new InvalidOperationException(
-                     $"Invalid instruction: {Program[InsPointer]}");
+                     $"Invalid instruction: {Program[Pointer]}");
             }
          }
       }
 
-      public void Push(int input) {
+      /// <summary>Push an input onto the input queue</summary>
+      public void Push(long input) {
          Inputs.Enqueue(input);
       }
 
@@ -117,7 +135,7 @@ namespace AdventOfCode.Advent2019 {
       /// </param>
       /// <param name="inputs">Program inputs</param>
       /// <returns>The last "output" value output by the computer</returns>
-      public static int Run(string program, params int[] inputs) {
+      public static long Run(string program, params long[] inputs) {
          IntcodeComputer computer = new IntcodeComputer(program, inputs);
          computer.Start();
          return computer.Output;
@@ -131,9 +149,10 @@ namespace AdventOfCode.Advent2019 {
       /// </param>
       /// <param name="inputs">Program inputs</param>
       /// <returns>The last "output" value output by the computer</returns>
-      public static int Run(int[] program, params int[] inputs) {
+      public static long Run(ref long[] program, params long[] inputs) {
          IntcodeComputer computer = new IntcodeComputer(program, inputs);
          computer.Start();
+         program = computer.Program.ToArray();
          return computer.Output;
       }
    }

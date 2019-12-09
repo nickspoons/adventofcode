@@ -25,9 +25,9 @@ namespace AdventOfCode.Advent2019 {
       }
 
       public override string A() {
-         int biggest = 0;
+         long biggest = 0;
          foreach (int[] phases in GetPermutations(new[] { 0, 1, 2, 3, 4 })) {
-            int input = 0;
+            long input = 0;
             foreach (int phase in phases)
                input = IntcodeComputer.Run(Input, phase, input);
             if (input > biggest)
@@ -37,7 +37,7 @@ namespace AdventOfCode.Advent2019 {
       }
 
       public override string B() {
-         int biggest = 0;
+         long biggest = 0;
          foreach (int[] phases in GetPermutations(new[] { 5, 6, 7, 8, 9 })) {
             IntcodeComputer[] amps = phases
                .Select(phase => new IntcodeComputer(Input, phase))

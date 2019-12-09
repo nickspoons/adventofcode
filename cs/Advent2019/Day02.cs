@@ -6,28 +6,28 @@ namespace AdventOfCode.Advent2019 {
       public override int Year => 2019;
 
       public override string A() {
-         int[] program = Input.Split(",").Select(int.Parse).ToArray();
+         long[] program = Input.Split(",").Select(long.Parse).ToArray();
          program[1] = 12;
          program[2] = 2;
-         IntcodeComputer.Run(program).ToString();
+         IntcodeComputer.Run(ref program);
          return program[0].ToString();
       }
 
       public override string B() {
-         int[] originalProgram = Input.Split(",").Select(int.Parse).ToArray();
-         int target = 19690720;
-         int a = 12;
-         int previous = 0;
-         int result = 0;
+         long[] originalProgram = Input.Split(",").Select(long.Parse).ToArray();
+         long target = 19690720;
+         long a = 12;
+         long previous = 0;
+         long result = 0;
          while (result < target) {
             previous = result;
-            int[] program = (int[]) originalProgram.Clone();
+            long[] program = (long[]) originalProgram.Clone();
             program[1] = ++a;
             program[2] = 0;
-            IntcodeComputer.Run(program);
+            IntcodeComputer.Run(ref program);
             result = program[0];
          }
-         int b = target - previous;
+         long b = target - previous;
          return (((a - 1) * 100) + b).ToString();
       }
    }

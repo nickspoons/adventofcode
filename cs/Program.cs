@@ -55,6 +55,7 @@ namespace AdventOfCode {
          }
          catch (Exception ex) {
             Console.WriteLine($"[{ex.GetType().ToString()}]: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
          }
       }
    }
