@@ -64,8 +64,8 @@ namespace AdventOfCode.Advent2019 {
          int index = (int) GetValue(Pointer + offset);
          if (GetMode(offset) == 2)
             index += RelativeBase;
-         if (index > Program.Count)
-            Program.AddRange(Enumerable.Repeat(0L, index - Program.Count + 2));
+         if (index >= Program.Count)
+            Program.AddRange(Enumerable.Repeat(0L, index - Program.Count + 1));
          Program[index] = value;
          Pointer += offset + 1;
       }
