@@ -28,9 +28,13 @@ namespace AdventOfCode.Advent2019 {
       public delegate void OutputHandler(long output);
       public delegate void YieldHandler();
 
+      public delegate long WantsInputHandler();
+
       public event HaltHandler OnHalt;
       public event OutputHandler OnOutput;
       public event YieldHandler OnYield;
+
+      public event WantsInputHandler WantsInput;
 
       private int GetMode(int offset) {
          int div = 10;
@@ -80,6 +84,8 @@ namespace AdventOfCode.Advent2019 {
                   SetResult(3, GetParam(1) * GetParam(2));
                   break;
                case 3: // Input
+                  if (WantsInput != null)
+                     Inputs.Enqueue(WantsInput.Invoke());
                   if (!Inputs.Any()) {
                      OnYield?.Invoke();
                      return;
