@@ -27,6 +27,7 @@ namespace AdventOfCode.Advent2019 {
       private int Y = HEIGHT / 2;
       private char Dir = 'k';
       private long NextInput = -1;
+      private bool Filling = false;
 
       private readonly Dictionary<char, int> DirToIns =
          new Dictionary<char, int> {
@@ -44,7 +45,7 @@ namespace AdventOfCode.Advent2019 {
          };
 
       private int Distance = 0;
-      private readonly List<Location> Seen = new List<Location>();
+      private List<Location> Seen = new List<Location>();
 
       private TaskCompletionSource<long> IOCompletionSource;
 
@@ -54,15 +55,32 @@ namespace AdventOfCode.Advent2019 {
          return IOCompletionSource.Task;
       }
 
-      private async Task<int> Explore() {
+      private async Task<int> Explore(bool distanceAfterFind) {
          Seen.Add(new Location(X, Y, Distance));
          (char, Location)[] options = await Look();
-         char dir = 'h';
+         char dir = 'o';
          Stack<(int, int, char)> forks = new Stack<(int, int, char)>();
+         int furthest = 0;
          while (true) {
-            if (options.Any(o => o.Item2.Air))
-               return Distance + 1;
-            char back = InvertDir[dir];
+            if (!Filling && options.Any(o => o.Item2.Oxygen)) {
+               // Found the oxygen tank
+               if (distanceAfterFind)
+                  return Distance + 1;
+               // Reset, and "fill" with oxygen.
+               await Move(options
+                  .Where(o => o.Item2.Oxygen)
+                  .Select(o => o.Item1)
+                  .First());
+               dir = 'o';
+               Filling = true;
+               Distance = 0;
+               Seen = new List<Location>();
+               forks = new Stack<(int, int, char)>();
+               Seen.Add(new Location(X, Y, Distance));
+               options = await Look();
+               PaintCursor();
+            }
+            char back = dir == 'o' ? 'x' : InvertDir[dir];
             dir = options
                .OrderByDescending(o => o.Item2.Distance)
                .Select(o => o.Item1)
@@ -76,6 +94,9 @@ namespace AdventOfCode.Advent2019 {
                   forks.Push((X, Y, alt));
             }
             if (back == dir) {
+               if (Filling && forks.Count == 0)
+                  // Filled with oxygen
+                  return furthest;
                // Backtrack to last fork
                (int, int, char) fork = forks.Pop();
                while (fork.Item1 != X || fork.Item2 != Y) {
@@ -92,6 +113,8 @@ namespace AdventOfCode.Advent2019 {
             }
             await Move(dir);
             Distance++;
+            if (Distance > furthest)
+               furthest = Distance;
             options = await Look();
             PaintCursor();
          }
@@ -115,17 +138,6 @@ namespace AdventOfCode.Advent2019 {
          return open.ToArray();
       }
 
-      private Location See() {
-         Location location = Seen.FirstOrDefault(l => l.X == X && l.Y == Y);
-         if (location == null) {
-            location = new Location(X, Y, Distance + 1);
-            if (Display[Y][X] == 'X')
-               location.Air = true;
-            Seen.Add(location);
-         }
-         return location;
-      }
-
       private async Task<Location> Test(char dir) {
          long val = await IO(DirToIns[dir]);
 
@@ -140,7 +152,13 @@ namespace AdventOfCode.Advent2019 {
             X = tx;
             Y = ty;
             Display[Y][X] = val == 1 ? '·' : 'X';
-            Location location = See();
+            Location location = Seen.FirstOrDefault(l => l.X == X && l.Y == Y);
+            if (location == null) {
+               location = new Location(X, Y, Distance + 1);
+               if (Display[Y][X] == 'X')
+                  location.Oxygen = true;
+               Seen.Add(location);
+            }
             Paint(X, Y, Display[Y][X]);
             return location;
          }
@@ -213,7 +231,7 @@ namespace AdventOfCode.Advent2019 {
             brain.Start();
          }
          else {
-            Task<int> task = Explore();
+            Task<int> task = Explore(true);
             brain.Start();
             task.Wait();
             distance = task.Result;
@@ -222,7 +240,15 @@ namespace AdventOfCode.Advent2019 {
       }
 
       public override string B() {
-         return "";
+         IntcodeComputer brain = new IntcodeComputer(Input);
+         brain.OnOutput += OnOutput;
+         brain.WantsInput += WantsInput;
+         int distance = 0;
+         Task<int> task = Explore(false);
+         brain.Start();
+         task.Wait();
+         distance = task.Result;
+         return distance.ToString();
       }
 
       private class Location {
@@ -232,7 +258,7 @@ namespace AdventOfCode.Advent2019 {
             Distance = distance;
          }
 
-         public bool Air { get; set; }
+         public bool Oxygen { get; set; }
          public int X { get; private set; }
          public int Y { get; private set; }
          public int Distance { get; private set; }
