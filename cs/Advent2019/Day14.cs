@@ -14,28 +14,28 @@ namespace AdventOfCode.Advent2019 {
                reaction.Inputs.Add(new Resource(part));
             Reactions.Add(reaction);
          }
-         Leftovers = Reactions.ToDictionary(r => r.Key, _ => 0);
+         Leftovers = Reactions.ToDictionary(r => r.Key, _ => 0L);
       }
 
       public override int Day => 14;
       public override int Year => 2019;
 
-      private readonly Dictionary<string, int> Leftovers;
+      private readonly Dictionary<string, long> Leftovers;
       private readonly List<Reaction> Reactions;
 
-      private int Requires(string key, int amount, int depth) {
+      private long Requires(string key, long amount, int depth) {
          Reaction reaction = Reactions.First(r => r.Key == key);
-         int making = reaction.Amount;
-         int batches = 1;
+         long making = reaction.Amount;
+         long batches = 1;
          while (making < amount) {
             making += reaction.Amount;
             batches++;
          }
          Leftovers[key] += making - amount;
 
-         int ore = 0;
+         long ore = 0;
          foreach (Resource input in reaction.Inputs) {
-            int wanted = input.Amount * batches;
+            long wanted = input.Amount * batches;
             if (input.Key == "ORE")
                ore += wanted;
             else {
@@ -59,6 +59,12 @@ namespace AdventOfCode.Advent2019 {
       }
 
       public override string B() {
+         // 1000000000000 / Requires("FUEL", 1, 0) == 1672134
+         // Requires("FUEL", 1672134, 0): 736842046419  (1:42 minutes)
+         // System.Console.WriteLine(naive);
+         // System.Console.WriteLine((int) naive);
+         // 
+         return Requires("FUEL", 1672134, 0).ToString();
          return "";
       }
 
@@ -71,9 +77,9 @@ namespace AdventOfCode.Advent2019 {
          public Resource(string raw) {
             Match re = Regex.Match(raw, @"(\d+) (\w+)");
             Key = re.Groups[2].Value;
-            Amount = int.Parse(re.Groups[1].Value);
+            Amount = long.Parse(re.Groups[1].Value);
          }
-         public int Amount { get; private set; }
+         public long Amount { get; private set; }
          public string Key { get; private set; }
       }
    }
