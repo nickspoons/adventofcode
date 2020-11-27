@@ -1,5 +1,5 @@
 # Open the input file
-with open("day01-input") as f:
+with open("aoc_01_input") as f:
     # Read the inputs line by line into variable "inputs"
     inputs = list(f)
 
