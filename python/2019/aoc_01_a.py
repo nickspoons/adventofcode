@@ -1,5 +1,11 @@
+""" Advent of Code, 2019: Day 01, a """
+
+import os.path
+
+input_file = os.path.join(os.path.dirname(__file__), "aoc_01_input")
+
 # Open the input file
-with open("aoc_01_input") as f:
+with open(input_file) as f:
     # Read the inputs line by line into variable "inputs"
     inputs = list(f)
 
