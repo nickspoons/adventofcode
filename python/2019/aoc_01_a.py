@@ -1,8 +1,10 @@
 """ Advent of Code, 2019: Day 01, a """
 
-import os.path
-
-input_file = os.path.join(os.path.dirname(__file__), "aoc_01_input")
+# __file__ contains this file's filename, e.g. aoc_01_a.py when run from this
+# directory or C:\code\aoc\python\2019\aoc_01_a.py when run from elsewhere.
+# We want to replace the "_a.py" at the end with "_input" to get the correct
+# input file name, e.g. aoc_01_input
+input_file = __file__[:-5] + "_input"
 
 # Open the input file
 with open(input_file) as f:
