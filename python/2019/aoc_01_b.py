@@ -1,12 +1,7 @@
 """ Advent of Code, 2019: Day 01, b """
 
-input_file = __file__[:-5] + "_input"
-with open(input_file) as f:
-    # Read the inputs line by line into variable "inputs"
+with open(__file__[:-5] + "_input") as f:
     inputs = list(f)
-
-# "inputs" now contains a list of "strings", one for each line of the input.
-# Convert these to integers, so they can be manipulated mathematically
 input_ints = [int(line) for line in inputs]
 
 fuel = 0
