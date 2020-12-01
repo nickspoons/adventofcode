@@ -6,8 +6,8 @@ input_ints = [int(line) for line in inputs]
 
 
 def run():
-    for val1 in input_ints:
-        for val2 in input_ints:
+    for i, val1 in enumerate(input_ints):
+        for val2 in input_ints[i:]:
             if val1 + val2 == 2020:
                 return val1 * val2
     return 0
