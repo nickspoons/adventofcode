@@ -17,7 +17,10 @@ def run(year, day, a_or_b):
     """Load and run the requested program"""
     filename = f"{year}.aoc_{day:02d}_{'b' if a_or_b else 'a'}"
 
-    importlib.import_module(filename, f"{year}")
+    mod = importlib.import_module(filename, f"{year}")
+    result = mod.run()
+
+    print(result)
 
 
 if __name__ == "__main__":

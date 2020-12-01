@@ -15,7 +15,13 @@ with open(input_file) as f:
 # Convert these to integers, so they can be manipulated mathematically
 input_ints = [int(line) for line in inputs]
 
-# Do some maths on each line, and sum all the results into variable "fuel"
-fuel = sum(line // 3 - 2 for line in input_ints)
 
-print(fuel)
+def run():
+    # Do some maths on each line, and sum all the results into variable "fuel"
+    fuel = sum(line // 3 - 2 for line in input_ints)
+
+    return fuel
+
+
+if __name__ == "__main__":
+    print(run())
