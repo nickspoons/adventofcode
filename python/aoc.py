@@ -11,6 +11,7 @@ Usage:  ./aoc.py <year> <day> [b]
 
 import importlib
 import sys
+import time
 
 
 def run(year, day, a_or_b):
@@ -18,9 +19,11 @@ def run(year, day, a_or_b):
     filename = f"{year}.aoc_{day:02d}_{'b' if a_or_b else 'a'}"
 
     mod = importlib.import_module(filename, f"{year}")
+    start = time.time()
     result = mod.run()
+    end = time.time()
 
-    print(result)
+    print(f"{result:<20} in {end - start:0.5f}s")
 
 
 if __name__ == "__main__":
