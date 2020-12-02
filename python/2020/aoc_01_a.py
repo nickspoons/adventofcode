@@ -6,6 +6,7 @@ input_ints = [int(line) for line in inputs]
 
 
 def run():
+    """ Use bounded, nested for loops to add values """
     for i, val1 in enumerate(input_ints):
         for val2 in input_ints[i:]:
             if val1 + val2 == 2020:
