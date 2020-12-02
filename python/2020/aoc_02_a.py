@@ -11,12 +11,12 @@ def run():
     valid = 0
     for line in inputs:
         match = re.match(r"(\d+)-(\d+) (.): (.*)", line)
-        nmin = int(match.group(1))
-        nmax = int(match.group(2))
+        limit_min = int(match.group(1))
+        limit_max = int(match.group(2))
         char = match.group(3)
         password = match.group(4)
-        nchar = len(password) - len(password.replace(char, ""))
-        if nmin <= nchar <= nmax:
+        num = password.count(char)
+        if limit_min <= num <= limit_max:
             valid += 1
 
     return valid
