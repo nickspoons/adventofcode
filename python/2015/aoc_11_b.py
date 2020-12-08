@@ -1,19 +1,9 @@
-""" Advent of Code, 2015: Day 11, a """
+""" Advent of Code, 2015: Day 11, b """
 
 with open(__file__[:-5] + "_input") as f:
     inputs = [line.strip() for line in f]
 
 DIGITS = "abcdefghjkmnpqrstuvwxyz"
-
-
-def from_base(s, b):
-    """ Convert string to number in arbitrary base """
-    return 0 if len(s) == 0 else b * from_base(s[:-1], b) + DIGITS.index(s[-1])
-
-
-def to_base(n, b):
-    """ Convert number to string in arbitrary base """
-    return "0" if not n else to_base(n // b, b).lstrip("0") + DIGITS[n % b]
 
 
 def validate_doubles(password):
@@ -32,7 +22,7 @@ def validate_sequence(password):
     """ Passwords must include one increasing straight of at least three
     letters, like abc, bcd, cde, and so on, up to xyz """
     for i, c in enumerate(password[:-2]):
-        if ord(c) == ord(password[i + 1]) - 1 == ord(password[i + 2]) - 2:
+        if c == password[i + 1] - 1 == password[i + 2] - 2:
             return True
     return False
 
@@ -42,20 +32,26 @@ def validate(password):
     return validate_doubles(password) and validate_sequence(password)
 
 
+def increment(digits, i):
+    """ Add one to a number represented as a list of base-23 digits """
+    if i < 0:
+        return
+    digits[i] += 1
+    if digits[i] >= 23:
+        digits[i] -= 23
+        increment(digits, i - 1)
+
+
 def run():
-    """ Validate passwords by converting to base 23 and incrementing """
-    # Since only alphabetic characters but not ["i", "l", "o"] are allowed, use
-    # base 23
-    old_password = from_base(inputs[0], 23)
-    n = 1
+    """ Validate passwords by converting to base 23 digits and incrementing """
+    digits = [DIGITS.index(c) for c in inputs[0]]
     first = True
     while True:
-        password = to_base(old_password + n, 23)
-        if validate(password):
+        increment(digits, len(digits) - 1)
+        if validate(digits):
             if not first:
-                return password
+                return "".join(DIGITS[i] for i in digits)
             first = False
-        n += 1
 
     return ""
 
