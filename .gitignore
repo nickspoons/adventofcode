@@ -4,3 +4,8 @@ bin/
 __pycache__/
 
 session_cookie
+
+*input
+*output
+*output-a
+*output-b
