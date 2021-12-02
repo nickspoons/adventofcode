@@ -2,6 +2,7 @@ tags
 obj/
 bin/
 __pycache__/
+.localrc
 
 session_cookie
 
