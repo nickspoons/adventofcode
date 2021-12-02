@@ -64,7 +64,7 @@ namespace AdventOfCode.Advent2019 {
          // System.Console.WriteLine(naive);
          // System.Console.WriteLine((int) naive);
          // 
-         return Requires("FUEL", 1672134, 0).ToString();
+         // return Requires("FUEL", 1672134, 0).ToString();
          return "";
       }
 
