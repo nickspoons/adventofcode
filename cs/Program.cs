@@ -1,12 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 
 namespace AdventOfCode {
    public class Program {
-      private static void Solve(Type adventDayType, bool a) {
-         IAdventDay adventDay = (IAdventDay) Activator.CreateInstance(adventDayType);
+      private static void DownloadInput(IAdventDay adventDay) {
+         Console.WriteLine($"Downloading {adventDay.Year}/{adventDay.Day} now");
+
+         string url = $"https://adventofcode.com/{adventDay.Year}/day/{adventDay.Day}/input";
+         string sessionCookie = File.ReadAllText("session_cookie");
+         using (WebClient client = new WebClient()) {
+            client.Headers.Add("Cookie", $"session={sessionCookie}");
+            client.DownloadFile(url, adventDay.InputFilename);
+         }
+      }
+
+      private static void Solve(IAdventDay adventDay, bool a) {
+         if (!adventDay.InputExists)
+            DownloadInput(adventDay);
 
          DateTime start = DateTime.Now;
          string output = a ? adventDay.A() : adventDay.B();
@@ -16,19 +30,45 @@ namespace AdventOfCode {
          Console.WriteLine($"{title} {output,-(80 - 24)}{time}");
       }
 
+      private static bool ParseArgs(string[] args, out int year, out int day, out bool a, out bool all, out bool input) {
+         year = 0;
+         day = 0;
+         a = true;
+         all = false;
+         input = false;
+         switch (args.Length) {
+            case 0:
+               return false;
+            case 1:
+               all = args[0] == "all";
+               return all;
+            default:
+               if (!(int.TryParse(args[0], out year) && int.TryParse(args[1], out day)))
+                  return false;
+               if (args.Length > 2) {
+                  input = args[2] == "input";
+                  a = args[2] == "a";
+               }
+               return true;
+         }
+      }
+
       public static void Main(string[] args) {
-         int year = 0;
-         int day = 0;
-         if ((args.Length != 1 || args[0] != "all")
-            && (args.Length < 2
-               || !int.TryParse(args[0], out year)
-               || !int.TryParse(args[1], out day))) {
-            Console.WriteLine("Usage:  dotnet.exe run <year> <day> [b]");
-            Console.WriteLine("Usage:  dotnet.exe run all");
-            Console.WriteLine("                          ");
-            Console.WriteLine("  eg.   dotnet.exe run 2019 1");
-            Console.WriteLine("        dotnet.exe run 2019 1 b");
-            Console.WriteLine("        dotnet.exe run all");
+         if (!ParseArgs(args, out int year, out int day, out bool a, out bool all, out bool input)) {
+            Console.WriteLine(@"
+Usage:  dotnet run <year> <day> [b]
+Usage:  dotnet run all
+
+  eg.   dotnet run 2021 1
+        dotnet run 2021 1 b
+        dotnet run all
+
+Download the day's input file:
+        dotnet run 2021 5 input
+
+Note: downloading the input file requires a valid session cookie, which can be
+fetched from browser developer tools.
+".Trim());
             return;
          }
 
@@ -39,10 +79,13 @@ namespace AdventOfCode {
                .Where(t => typeof(IAdventDay).IsAssignableFrom(t))
                .Where(t => !t.IsInterface && !t.IsAbstract);
 
-            if (args[0] == "all")
+            static IAdventDay activate(Type adventDayType) =>
+               (IAdventDay) Activator.CreateInstance(adventDayType);
+
+            if (all)
                foreach (Type adventDayType in adventDayTypes) {
-                  Solve(adventDayType, true);
-                  Solve(adventDayType, false);
+                  Solve(activate(adventDayType), true);
+                  Solve(activate(adventDayType), false);
                }
             else {
                Type adventDayType = adventDayTypes.FirstOrDefault(t => t.FullName == name);
@@ -50,11 +93,15 @@ namespace AdventOfCode {
                   Console.WriteLine("Day not solved");
                   return;
                }
-               Solve(adventDayType, args.Length <= 2);
+               IAdventDay adventDay = activate(adventDayType);
+               if (input)
+                  DownloadInput(adventDay);
+               else
+                  Solve(adventDay, a);
             }
          }
          catch (Exception ex) {
-            Console.WriteLine($"[{ex.GetType().ToString()}]: {ex.Message}");
+            Console.WriteLine($"[{ex.GetType()}]: {ex.Message}");
             Console.WriteLine(ex.StackTrace);
          }
       }
