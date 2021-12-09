@@ -8,5 +8,7 @@ namespace AdventOfCode {
 
       string A();
       string B();
+
+      void DownloadInput();
    }
 }

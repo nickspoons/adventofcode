@@ -1,35 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
 
 namespace AdventOfCode {
    public class Program {
-      private static void DownloadInput(IAdventDay adventDay) {
-         Console.WriteLine($"Downloading {adventDay.Year}/{adventDay.Day} now");
-
-         string url = $"https://adventofcode.com/{adventDay.Year}/day/{adventDay.Day}/input";
-         string sessionCookie = File.ReadAllText("session_cookie");
-         using (WebClient client = new WebClient()) {
-            client.Headers.Add("Cookie", $"session={sessionCookie}");
-            client.DownloadFile(url, adventDay.InputFilename);
-         }
-      }
-
-      private static void Solve(IAdventDay adventDay, bool a) {
-         if (!adventDay.InputExists)
-            DownloadInput(adventDay);
-
-         DateTime start = DateTime.Now;
-         string output = a ? adventDay.A() : adventDay.B();
-         TimeSpan time = DateTime.Now.Subtract(start);
-
-         string title = $"{adventDay.Year} {adventDay.Day:00}" + (a ? 'A' : 'B');
-         Console.WriteLine($"{title} {output,-(80 - 24)}{time}");
-      }
-
       private static bool ParseArgs(string[] args, out int year, out int day, out bool a, out bool all, out bool input) {
          year = 0;
          day = 0;
@@ -51,6 +26,15 @@ namespace AdventOfCode {
                }
                return true;
          }
+      }
+
+      private static void Solve(IAdventDay adventDay, bool a) {
+         DateTime start = DateTime.Now;
+         string output = a ? adventDay.A() : adventDay.B();
+         TimeSpan time = DateTime.Now.Subtract(start);
+
+         string title = $"{adventDay.Year} {adventDay.Day:00}" + (a ? 'A' : 'B');
+         Console.WriteLine($"{title} {output,-(80 - 24)}{time}");
       }
 
       public static void Main(string[] args) {
@@ -95,7 +79,7 @@ fetched from browser developer tools.
                }
                IAdventDay adventDay = activate(adventDayType);
                if (input)
-                  DownloadInput(adventDay);
+                  adventDay.DownloadInput();
                else
                   Solve(adventDay, a);
             }
