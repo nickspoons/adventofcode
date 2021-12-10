@@ -7,7 +7,7 @@ with open(__file__[:-5] + "_input") as f:
 
 
 def parse_input():
-    """ Read the input into distinct tiles (lists of strings) """
+    """ Read the input into distinct tiles (lists of edges) """
     tiles = []
     tile = [""] * 4     # list of 4 strings, in CSS order
     id = 0
@@ -38,16 +38,14 @@ def find_variants(tile):
     br = "".join(reversed(tile[2]))
     lr = "".join(reversed(tile[3]))
     return [
-        [t,  r,  b,  l ], # orig
-        [b,  rr, t,  lr], # flip-x
-        [tr, l,  br, r ], # flip-y
-        [br, lr, tr, rr], # flip-xy, or rotate-180
-        [r,  br, l,  tr], # rotate-left
-        [l,  b, r,  t], # rotate-left, then flip-x
+        [t,   r,  b,   l ], # orig
+        [b,   rr, t,   lr], # flip-x
+        [tr,  l,  br,  r ], # flip-y
+        [br,  lr, tr,  rr], # flip-xy, or rotate-180
+        [r,   br, l,   tr], # rotate-left
+        [l,   b,  r,   t],  # rotate-left, then flip-x
         [rr,  tr, lr,  br], # rotate-left, then flip-y
-        [lr,  t, rr,  b], # rotate-right
-        [rr,  tr, lr,  br], # rotate-right, then flip-x
-        [l,  b, r,  t], # rotate-right, then flip-y
+        [lr,  t,  rr,  b]   # rotate-right
     ]
 
 
