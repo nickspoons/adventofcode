@@ -9,10 +9,11 @@ namespace AdventOfCode.Advent2021 {
       public override int Day => 13;
       public override int Year => 2021;
 
-      private List<Fold> Folds = new List<Fold>();
-      private List<List<bool>> Points;
       private int MaxX { get; set; }
       private int MaxY { get; set; }
+
+      private readonly List<Fold> Folds = new List<Fold>();
+      private bool[][] Points;
 
       private void ParseInput() {
          List<int[]> coords = new List<int[]>();
@@ -26,12 +27,11 @@ namespace AdventOfCode.Advent2021 {
          }
          MaxX = coords.Max(c => c[0]);
          MaxY = coords.Max(c => c[1]);
-         Points = new List<List<bool>>();
-         for (int y = 0; y <= MaxY; y++) {
-            Points.Add(new List<bool>());
-            for (int x = 0; x <= MaxX; x++)
-               Points[y].Add(coords.Any(c => c[0] == x && c[1] == y));
-         }
+         Points = Enumerable.Range(0, MaxY + 1)
+            .Select(_ => new bool[MaxX + 1])
+            .ToArray();
+         foreach (int[] coord in coords)
+            Points[coord[1]][coord[0]] = true;
       }
 
       private void FoldPaper(Fold fold) {
